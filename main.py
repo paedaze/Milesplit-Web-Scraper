@@ -36,7 +36,7 @@ def main():
     process.crawl(athlete_spider, school_link=school_link, sport=sport, event=event, athlete_info_output=athlete_info_output)
     process.start()
 
-    athlete_table = ['Name', 'Event', 'Time'] + athlete_info_output
+    athlete_table = [['Name', 'Event', 'Time']] + athlete_info_output
     table = AsciiTable(athlete_table)
     print(table.table)
 
