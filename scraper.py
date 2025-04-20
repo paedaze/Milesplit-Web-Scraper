@@ -65,7 +65,7 @@ def get_school_link(school_name):
     return link + '/roster' # Returns the school roster link
 
 # Web spider for handling athlete data scraping
-# This spider scrapes the athlete data from the school page and stores it in a dictionary in main.py
+# This spider scrapes the athlete data from the school page and stores it in 'athlete_info_output'
 class athlete_spider(spiders.Spider):
     name = 'athletes'
 
