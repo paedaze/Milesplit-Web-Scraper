@@ -69,7 +69,7 @@ def get_school_link(school_name):
 class athlete_spider(spiders.Spider):
     name = 'athletes'
 
-    def __init__(self, school_link, sport, event, athlete_info_output, *args, **kwargs): # Allow spider to access school link and event
+    def __init__(self, school_link, sport, event, athlete_info_output, *args, **kwargs): # Allow spider to access school link, sport, event, and the output
         super().__init__(*args, **kwargs)
         self.school_link = school_link
         self.sport = sport
