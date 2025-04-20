@@ -1,10 +1,12 @@
 from scrapy.crawler import CrawlerProcess
+import scraper
 from scraper import athlete_spider
 from scraper import get_school_link
 from scraper import html_paths
 from scraper import Sport
-from scraper import Event
 from terminaltables3 import AsciiTable
+from tkinter import ttk
+from tkinter import *
 
 # Function to convert string to enum
 def string_to_enum(Enum, string):
@@ -26,8 +28,8 @@ def main():
     html_paths['data_season_id'] = "//li[@class='athlete-row data-row']/div[@data-season-id='{}']".format(sport.value)
 
     # Set the event given by user input
-    event_input = input("Enter the event (5000, 3200, 1600, 800, 400, 200, 100): ") + ' Meter Run'
-    event = Event(event_input)
+    event_input = input("Enter the event (5000, 3200, 1600, 1500, 1200, 800, 400, 200, 100): ") + ' Meter Run'
+    event = scraper.Event(event_input)
 
     athlete_info_output = []
 
@@ -40,4 +42,5 @@ def main():
     table = AsciiTable(athlete_table)
     print(table.table)
 
-main()
+if __name__ == "__main__":
+    main()
