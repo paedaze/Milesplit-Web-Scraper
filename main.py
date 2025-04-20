@@ -41,6 +41,3 @@ def main():
     print(table.table)
 
 main()
-
-main()
-
