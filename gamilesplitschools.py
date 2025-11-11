@@ -749,5 +749,4 @@ ga_milesplit_schools = {'A.R. Johnson Health Science and Engineering Magnet Scho
  'Worth County HS': 'https://ga.milesplit.com/teams/9037-worth-county-hs',
  'Wrens High School': 'https://ga.milesplit.com/teams/57232-wrens-high-school',
  'Yeshiva': 'https://ga.milesplit.com/teams/9126-yeshiva',
- 'Young Americans Christian School': 'https://ga.milesplit.com/teams/26901-young-americans-christian-school',
- 'null': 'https://ga.milesplit.com/teams/62589-null'}
+ 'Young Americans Christian School': 'https://ga.milesplit.com/teams/26901-young-americans-christian-school'}
