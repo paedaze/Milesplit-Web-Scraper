@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Meet Dashboard</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div class="app">
+        <header class="app__header">
+            <span class="app__title">GA Milesplit Virtual Meet Simulator</span>
+        </header>
+        <main class="dashboard">
+            <section class="panel panel--schools" aria-label="School search">
+                <label class="search-field">
+                    <span class="search-field__icon" aria-hidden="true"></span>
+                    <input type="search" placeholder="Search schools" aria-label="Search schools" data-role="school-search">
+                </label>
+                <div class="search-results" data-search-wrapper>
+                    <p class="search-hint" data-search-hint>Start typing to search for a school.</p>
+                    <ul class="school-list" aria-label="Available schools" data-role="search-results"></ul>
+                </div>
+            </section>
+            <section class="panel panel--selected" aria-labelledby="selected-title">
+                <h2 class="panel__title" id="selected-title">Schools</h2>
+                <p class="selected-hint" data-selected-hint>No schools selected. Choose from the search results.</p>
+                <ul class="selected-list" data-role="selected-schools"></ul>
+            </section>
+            <section class="panel panel--results" aria-label="Event results">
+                <div class="panel__filters">
+                    <label class="filter dropdown">
+                        <span class="filter__label">Sport</span>
+                        <div class="dropdown__control">
+                            <span class="caret" aria-hidden="true">&#9662;</span>
+                            <select aria-label="Select sport" data-role="sport-select"></select>
+                        </div>
+                    </label>
+                    <label class="filter dropdown">
+                        <span class="filter__label">Event</span>
+                        <div class="dropdown__control">
+                            <span class="caret" aria-hidden="true">&#9662;</span>
+                            <select aria-label="Select event" data-role="event-select"></select>
+                        </div>
+                    </label>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Place</th>
+                                <th scope="col">Athlete</th>
+                                <th scope="col">School</th>
+                                <th scope="col">Time</th>
+                                <th scope="col">Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="align-center">1</td>
+                                <td>Jameson Pifer</td>
+                                <td>Collins Hill High School</td>
+                                <td>14:37</td>
+                                <td class="align-center">1</td>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="ga-milesplit-schools.js"></script>
+    <script>
+        (function () {
+            const SPORTS = [
+                { id: 'CROSS_COUNTRY', label: 'Cross Country', seasonId: 3 },
+                { id: 'OUTDOOR_TRACK', label: 'Outdoor Track', seasonId: 2 },
+                { id: 'INDOOR_TRACK', label: 'Indoor Track', seasonId: 1 }
+            ];
+
+            const EVENTS = [
+                { id: 'FIVE_THOUSAND', label: '5000 Meter Run' },
+                { id: 'THIRTYTWO_HUNDRED', label: '3200 Meter Run' },
+                { id: 'SIXTEEN_HUNDRED', label: '1600 Meter Run' },
+                { id: 'FIFTEEN_HUNDRED', label: '1500 Meter Run' },
+                { id: 'TWELVE_HUNDRED', label: '1200 Meter Run' },
+                { id: 'EIGHT_HUNDRED', label: '800 Meter Run' },
+                { id: 'FOUR_HUNDRED', label: '400 Meter Run' },
+                { id: 'TWO_HUNDRED', label: '200 Meter Run' },
+                { id: 'ONE_HUNDRED', label: '100 Meter Run' }
+            ];
+
+            const schoolsMap = window.GA_MILESPLIT_SCHOOLS || {};
+            const schoolNames = Object.keys(schoolsMap).sort((a, b) => a.localeCompare(b));
+            const searchInput = document.querySelector('[data-role="school-search"]');
+            const resultsList = document.querySelector('[data-role="search-results"]');
+            const selectedList = document.querySelector('[data-role="selected-schools"]');
+            const searchHint = document.querySelector('[data-search-hint]');
+            const selectedHint = document.querySelector('[data-selected-hint]');
+            const sportSelect = document.querySelector('[data-role="sport-select"]');
+            const eventSelect = document.querySelector('[data-role="event-select"]');
+            const MAX_RESULTS = 12;
+            const selected = [];
+
+            const setHint = (el, message, isHidden) => {
+                if (!el) {
+                    return;
+                }
+                el.textContent = message;
+                el.hidden = !!isHidden;
+            };
+
+            const renderResults = (names, emptyMessage) => {
+                resultsList.innerHTML = '';
+                if (!names.length) {
+                    setHint(searchHint, emptyMessage || 'No schools match your search.', false);
+                    return;
+                }
+                setHint(searchHint, '', true);
+                const frag = document.createDocumentFragment();
+                names.forEach((name) => {
+                    const li = document.createElement('li');
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'result-option';
+                    button.dataset.schoolName = name;
+                    button.textContent = name;
+                    button.setAttribute('aria-label', `Add ${name} to selected schools`);
+                    li.appendChild(button);
+                    frag.appendChild(li);
+                });
+                resultsList.appendChild(frag);
+            };
+
+            const renderSelected = () => {
+                selectedList.innerHTML = '';
+                if (!selected.length) {
+                    setHint(selectedHint, 'No schools selected. Choose from the search results.', false);
+                    return;
+                }
+                setHint(selectedHint, '', true);
+                const frag = document.createDocumentFragment();
+                selected.forEach((name) => {
+                    const li = document.createElement('li');
+                    li.className = 'selected-pill';
+                    const labelSpan = document.createElement('span');
+                    labelSpan.textContent = name;
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.className = 'pill__remove';
+                    removeBtn.dataset.removeSchool = name;
+                    removeBtn.setAttribute('aria-label', `Remove ${name}`);
+                    removeBtn.textContent = 'x';
+                    li.append(labelSpan, removeBtn);
+                    frag.appendChild(li);
+                });
+                selectedList.appendChild(frag);
+            };
+
+            const addSchool = (name) => {
+                if (!name || selected.includes(name)) {
+                    return;
+                }
+                selected.push(name);
+                renderSelected();
+            };
+
+            const removeSchool = (name) => {
+                const index = selected.indexOf(name);
+                if (index === -1) {
+                    return;
+                }
+                selected.splice(index, 1);
+                renderSelected();
+            };
+
+            const getMatches = (query) => {
+                const trimmed = query.trim().toLowerCase();
+                if (!trimmed) {
+                    return [];
+                }
+                return schoolNames
+                    .filter((name) => name.toLowerCase().includes(trimmed))
+                    .slice(0, MAX_RESULTS);
+            };
+
+            const populateSelect = (selectEl, items, config = {}) => {
+                if (!selectEl) {
+                    return;
+                }
+                const { valueKey = 'id', textKey = 'label' } = config;
+                selectEl.innerHTML = '';
+                items.forEach((item) => {
+                    const option = document.createElement('option');
+                    option.value = item[valueKey];
+                    option.textContent = item[textKey];
+                    if (item.seasonId) {
+                        option.dataset.seasonId = item.seasonId;
+                    }
+                    if (item.label) {
+                        option.dataset.label = item.label;
+                    }
+                    selectEl.appendChild(option);
+                });
+            };
+
+            populateSelect(sportSelect, SPORTS);
+            populateSelect(eventSelect, EVENTS);
+
+            searchInput.addEventListener('input', () => {
+                const value = searchInput.value;
+                if (!value.trim()) {
+                    renderResults([], 'Start typing to search for a school.');
+                    return;
+                }
+                const matches = getMatches(value);
+                renderResults(matches, 'No schools match your search. Try another name.');
+            });
+
+            resultsList.addEventListener('click', (event) => {
+                const button = event.target.closest('button[data-school-name]');
+                if (!button) {
+                    return;
+                }
+                addSchool(button.dataset.schoolName);
+            });
+
+            selectedList.addEventListener('click', (event) => {
+                const button = event.target.closest('button[data-remove-school]');
+                if (!button) {
+                    return;
+                }
+                removeSchool(button.dataset.removeSchool);
+            });
+
+            searchInput.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter') {
+                    return;
+                }
+                const firstOption = resultsList.querySelector('button[data-school-name]');
+                if (firstOption) {
+                    addSchool(firstOption.dataset.schoolName);
+                }
+            });
+
+            renderResults([], 'Start typing to search for a school.');
+            renderSelected();
+        })();
+    </script>
+</body>
+</html>
