@@ -219,7 +219,7 @@ body {
 .panel__filters {
     display: flex;
     gap: 0.9rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .filter {
@@ -239,6 +239,8 @@ body {
 }
 
 .filter.dropdown {
+    flex: 1 1 0;
+    min-width: 0;
     flex-direction: column;
     align-items: stretch;
     gap: 0.4rem;
@@ -255,27 +257,52 @@ body {
 .dropdown__control {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.6rem;
+    justify-content: space-between;
 }
 
-.dropdown__control .caret {
+.dropdown__value {
+    flex: 1;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 0.2rem 0;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown__trigger {
+    position: relative;
+    width: 2.5rem;
+    height: 2.1rem;
+    border: 2px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.dropdown__trigger .caret {
     font-size: 0.85rem;
     pointer-events: none;
 }
 
-.dropdown__control select {
-    flex: 1;
-    border: none;
-    background: transparent;
-    font: inherit;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    padding: 0.2rem 0;
-    appearance: none;
+.dropdown__select {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
     cursor: pointer;
+    width: 100%;
+    height: 100%;
+    border: none;
+    appearance: none;
+    background: transparent;
 }
 
-.dropdown__control select:focus-visible {
+.dropdown__select:focus-visible {
     outline: none;
 }
 
