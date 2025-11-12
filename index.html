@@ -32,15 +32,21 @@
                     <label class="filter dropdown">
                         <span class="filter__label">Sport</span>
                         <div class="dropdown__control">
-                            <span class="caret" aria-hidden="true">&#9662;</span>
-                            <select aria-label="Select sport" data-role="sport-select"></select>
+                            <span class="dropdown__value" data-role="sport-display">Select sport</span>
+                            <span class="dropdown__trigger">
+                                <span class="caret" aria-hidden="true">&#9662;</span>
+                                <select class="dropdown__select" aria-label="Select sport" data-role="sport-select"></select>
+                            </span>
                         </div>
                     </label>
                     <label class="filter dropdown">
                         <span class="filter__label">Event</span>
                         <div class="dropdown__control">
-                            <span class="caret" aria-hidden="true">&#9662;</span>
-                            <select aria-label="Select event" data-role="event-select"></select>
+                            <span class="dropdown__value" data-role="event-display">Select event</span>
+                            <span class="dropdown__trigger">
+                                <span class="caret" aria-hidden="true">&#9662;</span>
+                                <select class="dropdown__select" aria-label="Select event" data-role="event-select"></select>
+                            </span>
                         </div>
                     </label>
                 </div>
@@ -98,6 +104,8 @@
             const selectedHint = document.querySelector('[data-selected-hint]');
             const sportSelect = document.querySelector('[data-role="sport-select"]');
             const eventSelect = document.querySelector('[data-role="event-select"]');
+            const sportDisplay = document.querySelector('[data-role="sport-display"]');
+            const eventDisplay = document.querySelector('[data-role="event-display"]');
             const MAX_RESULTS = 12;
             const selected = [];
 
@@ -203,8 +211,25 @@
                 });
             };
 
+            const updateDropdownDisplay = (selectEl, displayEl) => {
+                if (!selectEl || !displayEl) {
+                    return;
+                }
+                const option = selectEl.selectedOptions[0];
+                displayEl.textContent = option ? option.textContent : 'Select option';
+            };
+
             populateSelect(sportSelect, SPORTS);
             populateSelect(eventSelect, EVENTS);
+            updateDropdownDisplay(sportSelect, sportDisplay);
+            updateDropdownDisplay(eventSelect, eventDisplay);
+
+            sportSelect?.addEventListener('change', () =>
+                updateDropdownDisplay(sportSelect, sportDisplay)
+            );
+            eventSelect?.addEventListener('change', () =>
+                updateDropdownDisplay(eventSelect, eventDisplay)
+            );
 
             searchInput.addEventListener('input', () => {
                 const value = searchInput.value;
