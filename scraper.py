@@ -8,6 +8,7 @@ class Sport(Enum):
 
 class Event(Enum):
     FIVE_THOUSAND = '5000 Meter Run'
+    TWO_MILE = '2 Mile Run'
     THIRTYTWO_HUNDRED = '3200 Meter Run'
     SIXTEEN_HUNDRED = '1600 Meter Run'
     FIFTEEN_HUNDRED = '1500 Meter Run'
