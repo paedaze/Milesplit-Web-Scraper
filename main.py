@@ -32,6 +32,6 @@ def load_school_map():
 def schools():
     return jsonify(load_school_map())
 
-
 if __name__ == '__main__':
     app.run(debug=True)
+
