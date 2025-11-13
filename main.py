@@ -28,6 +28,12 @@ def load_school_map():
         schools = cursor.fetchall()
     return {name: link for name, link in schools}
 
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
 @app.route("/api/schools")
 def schools():
     return jsonify(load_school_map())
@@ -35,5 +41,3 @@ def schools():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
