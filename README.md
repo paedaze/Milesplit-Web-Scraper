@@ -1,2 +1,2 @@
-# Milesplit Web Scraper
-Web scraper for scraping data from schools on milesplit. Scrapeable data includes race times, names, athlete rosters, etc.
+# GA Milesplit Virtual Meet Simulator
+This is a website used for simulating virtual meets among schools on Georgia Milesplit. Search for any GA Milesplit school to add to the meet and the website will simulate a virtual meet with the chosen schools.
