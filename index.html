@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Virtual Meet Dashboard</title>
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="../static/main.css">
 </head>
 <body>
     <div class="app">
@@ -74,7 +74,6 @@
             </section>
         </main>
     </div>
-    <script src="ga-milesplit-schools.js"></script>
     <script>
         (function () {
             const SPORTS = [
@@ -85,6 +84,7 @@
 
             const EVENTS = [
                 { id: 'FIVE_THOUSAND', label: '5000 Meter Run' },
+                { id: 'TWO_MILE', label: '2 Mile Run' },
                 { id: 'THIRTYTWO_HUNDRED', label: '3200 Meter Run' },
                 { id: 'SIXTEEN_HUNDRED', label: '1600 Meter Run' },
                 { id: 'FIFTEEN_HUNDRED', label: '1500 Meter Run' },
@@ -95,8 +95,8 @@
                 { id: 'ONE_HUNDRED', label: '100 Meter Run' }
             ];
 
-            const schoolsMap = window.GA_MILESPLIT_SCHOOLS || {};
-            const schoolNames = Object.keys(schoolsMap).sort((a, b) => a.localeCompare(b));
+            let schoolsMap = {};
+            let schoolNames = [];
             const searchInput = document.querySelector('[data-role="school-search"]');
             const resultsList = document.querySelector('[data-role="search-results"]');
             const selectedList = document.querySelector('[data-role="selected-schools"]');
@@ -115,6 +115,32 @@
                 }
                 el.textContent = message;
                 el.hidden = !!isHidden;
+            };
+
+            const loadSchools = async () => {
+                setHint(searchHint, 'Loading schools...', false);
+                if (searchInput) {
+                    searchInput.disabled = true;
+                }
+                try {
+                    const response = await fetch('/api/schools');
+                    if (!response.ok) {
+                        throw new Error(`Request failed with status ${response.status}`);
+                    }
+                    schoolsMap = await response.json();
+                    schoolNames = Object.keys(schoolsMap).sort((a, b) => a.localeCompare(b));
+                    if (searchInput) {
+                        searchInput.disabled = false;
+                    }
+                    setHint(searchHint, 'Start typing to search for a school.', false);
+                } catch (error) {
+                    console.error('Unable to load school list', error);
+                    setHint(
+                        searchHint,
+                        'Unable to load school list. Refresh the page to try again.',
+                        false
+                    );
+                }
             };
 
             const renderResults = (names, emptyMessage) => {
@@ -267,8 +293,9 @@
                 }
             });
 
-            renderResults([], 'Start typing to search for a school.');
+            renderResults([], 'Loading school list...');
             renderSelected();
+            loadSchools();
         })();
     </script>
 </body>
