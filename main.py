@@ -5,7 +5,7 @@ from flask import Flask, jsonify, render_template
 from scrapy.crawler import CrawlerProcess
 
 import scraper
-from scraper import Sport, athlete_spider, html_paths
+from scraper import Sport, athlete_spider, HTML_PATHS
 
 
 # Function to convert string to enum
