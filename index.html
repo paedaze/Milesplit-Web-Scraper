@@ -9,77 +9,100 @@
 <body>
     <div class="app">
         <header class="app__header">
-            <span class="app__title">GA Milesplit Virtual Meet Simulator</span>
+            <div>
+                <p class="eyebrow">Virtual Meet</p>
+                <h1 class="app__title">GA Milesplit Virtual Meet Simulator</h1>
+                <p class="app__subtitle">Search schools, build your lineup, and view simulated results.</p>
+            </div>
         </header>
         <main class="dashboard">
             <section class="panel panel--schools" aria-label="School search">
-                <label class="search-field">
-                    <span class="search-field__icon" aria-hidden="true"></span>
-                    <input type="search" placeholder="Search schools" aria-label="Search schools" data-role="school-search">
-                </label>
-                <div class="search-results" data-search-wrapper>
-                    <p class="search-hint" data-search-hint>Start typing to search for a school.</p>
-                    <ul class="school-list" aria-label="Available schools" data-role="search-results"></ul>
+                <div class="panel__header">
+                    <h2>Find schools</h2>
+                    <p>Search the GA database and add schools to your simulation.</p>
+                </div>
+                <div class="panel__body">
+                    <label class="search-field">
+                        <span class="search-field__icon" aria-hidden="true"></span>
+                        <input type="search" placeholder="Search schools" aria-label="Search schools" data-role="school-search">
+                    </label>
+                    <div class="search-results" data-search-wrapper">
+                        <p class="search-hint" data-search-hint>Start typing to search for a school.</p>
+                        <ul class="school-list" aria-label="Available schools" data-role="search-results"></ul>
+                    </div>
                 </div>
             </section>
             <section class="panel panel--selected" aria-labelledby="selected-title">
-                <h2 class="panel__title" id="selected-title">Schools</h2>
-                <p class="selected-hint" data-selected-hint>No schools selected. Choose from the search results.</p>
-                <ul class="selected-list" data-role="selected-schools"></ul>
+                <div class="panel__header">
+                    <h2 id="selected-title">Selected schools</h2>
+                    <p>Manage the schools included in your virtual meet.</p>
+                </div>
+                <div class="panel__body">
+                    <p class="selected-hint" data-selected-hint>No schools selected. Choose from the search results.</p>
+                    <ul class="selected-list" data-role="selected-schools"></ul>
+                </div>
             </section>
             <section class="panel panel--results" aria-label="Event results">
-                <div class="panel__filters">
-                    <label class="filter dropdown">
-                        <span class="filter__label">Sport</span>
-                        <div class="dropdown__control">
-                            <span class="dropdown__value" data-role="sport-display">Select sport</span>
-                            <span class="dropdown__trigger">
-                                <span class="caret" aria-hidden="true">&#9662;</span>
-                                <select class="dropdown__select" aria-label="Select sport" data-role="sport-select"></select>
-                            </span>
-                        </div>
-                    </label>
-                    <label class="filter dropdown">
-                        <span class="filter__label">Event</span>
-                        <div class="dropdown__control">
-                            <span class="dropdown__value" data-role="event-display">Select event</span>
-                            <span class="dropdown__trigger">
-                                <span class="caret" aria-hidden="true">&#9662;</span>
-                                <select class="dropdown__select" aria-label="Select event" data-role="event-select"></select>
-                            </span>
-                        </div>
-                    </label>
-                    <label class="filter dropdown">
-                        <span class="filter__label">Gender</span>
-                        <div class="dropdown__control">
-                            <span class="dropdown__value" data-role="gender-display">Select gender</span>
-                            <span class="dropdown__trigger">
-                                <span class="caret" aria-hidden="true">&#9662;</span>
-                                <select class="dropdown__select" aria-label="Select gender" data-role="gender-select"></select>
-                            </span>
-                        </div>
-                    </label>
+                <div class="panel__header panel__header--row">
+                    <div>
+                        <h2>Virtual meet</h2>
+                        <p>Choose sport, event, and gender to view standings.</p>
+                    </div>
                 </div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th scope="col">Place</th>
-                                <th scope="col">Athlete</th>
-                                <th scope="col">School</th>
-                                <th scope="col">Time</th>
-                                <th scope="col">Points</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="align-center">1</td>
-                                <td>Jameson Pifer</td>
-                                <td>Collins Hill High School</td>
-                                <td>14:37</td>
-                                <td class="align-center">1</td>
-                        </tbody>
-                    </table>
+                <div class="panel__body panel__body--padded">
+                    <div class="panel__filters">
+                        <label class="filter dropdown">
+                            <span class="filter__label">Sport</span>
+                            <div class="dropdown__control">
+                                <span class="dropdown__value" data-role="sport-display">Select sport</span>
+                                <span class="dropdown__trigger">
+                                    <span class="caret" aria-hidden="true">&#9662;</span>
+                                    <select class="dropdown__select" aria-label="Select sport" data-role="sport-select"></select>
+                                </span>
+                            </div>
+                        </label>
+                        <label class="filter dropdown">
+                            <span class="filter__label">Event</span>
+                            <div class="dropdown__control">
+                                <span class="dropdown__value" data-role="event-display">Select event</span>
+                                <span class="dropdown__trigger">
+                                    <span class="caret" aria-hidden="true">&#9662;</span>
+                                    <select class="dropdown__select" aria-label="Select event" data-role="event-select"></select>
+                                </span>
+                            </div>
+                        </label>
+                        <label class="filter dropdown">
+                            <span class="filter__label">Gender</span>
+                            <div class="dropdown__control">
+                                <span class="dropdown__value" data-role="gender-display">Select gender</span>
+                                <span class="dropdown__trigger">
+                                    <span class="caret" aria-hidden="true">&#9662;</span>
+                                    <select class="dropdown__select" aria-label="Select gender" data-role="gender-select"></select>
+                                </span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="align-center">Place</th>
+                                    <th scope="col">Athlete</th>
+                                    <th scope="col">School</th>
+                                    <th scope="col">Time</th>
+                                    <th scope="col" class="align-center">Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="align-center">1</td>
+                                    <td>Jameson Pifer</td>
+                                    <td>Collins Hill High School</td>
+                                    <td>14:37</td>
+                                    <td class="align-center">1</td>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </main>
