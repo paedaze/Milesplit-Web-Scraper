@@ -29,11 +29,7 @@ def update_school_database():
     cursor = conn.cursor()
 
     # Create a table
-    cursor.execute(
-        '''
-        CREATE TABLE IF NOT EXISTS gamilesplitschools (name TEXT, link TEXT)
-        '''
-    )
+    cursor.execute("CREATE TABLE IF NOT EXISTS gamilesplitschools (name TEXT, link TEXT)")
 
     # Run web spider
     school_links = {}
@@ -43,13 +39,7 @@ def update_school_database():
 
     # Insert data into database
     for school_name, school_link in school_links.items():
-        cursor.execute(
-            '''
-            INSERT INTO gamilesplitschools (name, link)
-            VALUES (?, ?)
-            ''',
-            (school_name, school_link)
-        )
+        cursor.execute("INSERT INTO gamilesplitschools (name, link) VALUES (?, ?)", (school_name, school_link))
 
     conn.commit()
     conn.close()
@@ -60,9 +50,7 @@ def read_school_database():
     conn = sqlite3.connect('ga-milesplit-school-database.db')
     cursor = conn.cursor()
 
-    cursor.execute(
-        '''SELECT name, link from gamilesplitschools'''
-    )
+    cursor.execute("SELECT name, link FROM gamilesplitschools")
 
     schools = cursor.fetchall()
     for row in schools:
