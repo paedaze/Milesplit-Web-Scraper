@@ -36,7 +36,7 @@ HTML_PATHS = {
     'student_name_xpath': "//h1[@class='athlete-name']/text()"
 }
 
-def initialize_database():
+def initialize_athlete_database():
     # Connect to a database (or create a new one if it doesn't exist)
     conn = sqlite3.connect('athletes.db')
     cursor = conn.cursor()
@@ -44,7 +44,7 @@ def initialize_database():
     # Create tables for athletes, events, schools, and results: normalized strategy for data
     cursor.execute("CREATE TABLE IF NOT EXISTS athletes (athlete_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL)")
     cursor.execute("CREATE TABLE IF NOT EXISTS events (event_id INTEGER PRIMARY KEY AUTOINCREMENT, event_name TEXT UNIQUE NOT NULL)")
-    cursor.execute("CREATE TABLE IF NOT EXISTS genders (gender_id INTEGER PRIMARY KEY AUTOINCREMENT, gender_name TEXT UNIQUE NOT NULL)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS genders (gender_id INTEGER PRIMARY KEY AUTOINCREMENT, gender TEXT UNIQUE NOT NULL)")
     cursor.execute("CREATE TABLE IF NOT EXISTS schools (school_id INTEGER PRIMARY KEY AUTOINCREMENT, school_name TEXT UNIQUE NOT NULL)")
     cursor.execute(
     '''
@@ -70,7 +70,7 @@ def initialize_database():
 
     # Populate table for genders
     for gender in Gender:
-        cursor.execute("INSERT OR IGNORE INTO genders (gender_name) VALUES (?)", (gender.value,))
+        cursor.execute("INSERT OR IGNORE INTO genders (gender) VALUES (?)", (gender.value,))
 
     # Populate table for schools
     with sqlite3.connect('ga-milesplit-school-database.db') as school_conn:
@@ -85,37 +85,26 @@ def initialize_database():
 
 # FOR DEVELOPER TESTING: Prints out the athletes.db database to the terminal
 def read_database():
-    conn = sqlite3.connect('athletes.db')
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        SELECT a.name, e.event_name, r.time
-        FROM athletes a
-        LEFT JOIN results r ON a.athlete_id = r.athlete_id
-        LEFT JOIN events e ON r.event_id = e.event_id
-        ORDER BY a.name, e.event_name
-        """
-    )
-    rows = cursor.fetchall()
-    if not rows:
-        print("No athlete data found in athletes.db")
-    else:
-        current_name = None
-        has_events = False
-        for name, event_name, event_time in rows:
-            if name != current_name:
-                if current_name is not None and not has_events:
-                    print("  No recorded events.")
-                print(f"Athlete: {name}")
-                current_name = name
-                has_events = False
-            if event_name:
-                display_time = event_time if event_time else "N/A"
-                print(f"  {event_name}: {display_time}")
-                has_events = True
-        if current_name is not None and not has_events:
-            print("  No recorded events.")
-        conn.close()
+    try:
+        conn = sqlite3.connect('athletes.db')
+        cursor = conn.cursor()
+
+        print("\n--- results (joined) ---")
+        for row in cursor.execute("""
+            SELECT a.athlete_id, a.name, s.school_name, g.gender, e.event_name, r.time
+            FROM results r
+            JOIN athletes a ON r.athlete_id = a.athlete_id
+            JOIN schools s ON r.school_id = s.school_id
+            JOIN genders g ON r.gender_id = g.gender_id
+            JOIN events e ON r.event_id = e.event_id
+            ORDER BY a.name, e.event_name
+        """):
+            print(row)
+    except sqlite3.Error as e:
+        print(f"Error reading database: {e}")
+    finally:
+        if 'conn' in locals():
+            conn.close()
 
 # Web spider for handling athlete data scraping
 # This spider scrapes the athlete data from the school page and stores it in 'athlete_info_output'
@@ -128,7 +117,7 @@ class athlete_spider(spiders.Spider):
         self.sport = sport
         self.start_urls = [self.school_link]
         self.school_name = ''
-        initialize_database()
+        initialize_athlete_database()
 
     def parse(self, response): # Parse the school roster page
         self.school_name = response.xpath("//section[@class='jumbotron-content']/h1/text()").get()
@@ -144,32 +133,6 @@ class athlete_spider(spiders.Spider):
     def parse_athlete_info(self, response, gender): # Parse each athlete's page
         # Find athlete name
         athlete_name = response.xpath(HTML_PATHS['student_name_xpath']).get()
-
-        # Initialize database connection
-        conn = sqlite3.connect('athletes.db')
-        cursor = conn.cursor()
-
-        # Insert athlete entry and Find athlete_id from athlete_name
-        cursor.execute("INSERT OR IGNORE INTO athletes (name) VALUES (?)", (athlete_name,))
-        cursor.execute("SELECT athlete_id FROM athletes WHERE name = ?", (athlete_name,))
-        athlete_row = cursor.fetchone()
-        if not athlete_row:
-            return 
-        athlete_id = athlete_row[0]
-
-        # Find school_id from school_name
-        cursor.execute("SELECT school_id FROM schools WHERE school_name = ?", (self.school_name,))
-        school_row = cursor.fetchone()
-        if not school_row:
-            return
-        school_id = school_row[0]
-
-        # Find gender_id from gender
-        cursor.execute("SELECT gender_id FROM genders WHERE gender_name = ?", (gender.value,))
-        gender_row = cursor.fetchone()
-        if not gender_row:
-            return
-        gender_id = gender_row[0]
 
         # Find high school record box
         high_school_heading = None
@@ -191,28 +154,32 @@ class athlete_spider(spiders.Spider):
                 print(event_name + " not included in Event Enum")
                 continue
 
-            # Find event_id through event_name
-            cursor.execute("SELECT event_id FROM events WHERE event_name = ?", (event_name,))
-            event_row = cursor.fetchone()
-            if not event_row:
-                continue
-            event_id = event_row[0]
+            yield {
+                'athlete_name': athlete_name,
+                'school_name': self.school_name,
+                'gender': gender.value,
+                'event_name': event_name,
+                'event_time': event_time
+            }
 
-            cursor.execute("INSERT OR REPLACE INTO results (athlete_id, event_id, school_id, gender_id, time) VALUES (?, ?, ?, ?, ?)", (athlete_id, event_id, school_id, gender_id, event_time))
-        
-        conn.commit()
-        conn.close()
+def crawl_school(roster_link):
+    process = CrawlerProcess()
+    process = CrawlerProcess(settings={
+        'ITEM_PIPELINES': {
+            'pipelines.AthleteDatabasePipeline': 300
+        }
+    })
+    process.crawl(athlete_spider, school_link=roster_link, sport=Sport.CROSS_COUNTRY)
+    process.start()
 
 def main():
     inp = input(str('Do you want to scrape data, read data, or initialize database? (S/R/I): '))
     if inp.upper() == 'S':
-        process = CrawlerProcess()
-        process.crawl(athlete_spider, school_link='https://ga.milesplit.com/teams/4452-parkview-high-school/roster', sport=Sport.CROSS_COUNTRY)
-        process.start()
+        crawl_school('https://ga.milesplit.com/teams/9127-hebron-christian/roster')
     elif inp.upper() == 'R':
         read_database()
     elif inp.upper() == 'I':
-        initialize_database()
+        initialize_athlete_database()
 
 if __name__ == '__main__':
     main()
