@@ -49,6 +49,16 @@
                             </span>
                         </div>
                     </label>
+                    <label class="filter dropdown">
+                        <span class="filter__label">Gender</span>
+                        <div class="dropdown__control">
+                            <span class="dropdown__value" data-role="gender-display">Select gender</span>
+                            <span class="dropdown__trigger">
+                                <span class="caret" aria-hidden="true">&#9662;</span>
+                                <select class="dropdown__select" aria-label="Select gender" data-role="gender-select"></select>
+                            </span>
+                        </div>
+                    </label>
                 </div>
                 <div class="table-wrapper">
                     <table>
@@ -95,6 +105,11 @@
                 { id: 'ONE_HUNDRED', label: '100 Meter Run' }
             ];
 
+            const GENDERS = [
+                { id: 'MALE', label: 'Male', value: 'm' },
+                { id: 'FEMALE', label: 'Female', value: 'f' }
+            ];
+
             let schoolsMap = {};
             let schoolNames = [];
             const searchInput = document.querySelector('[data-role="school-search"]');
@@ -104,8 +119,10 @@
             const selectedHint = document.querySelector('[data-selected-hint]');
             const sportSelect = document.querySelector('[data-role="sport-select"]');
             const eventSelect = document.querySelector('[data-role="event-select"]');
+            const genderSelect = document.querySelector('[data-role="gender-select"]');
             const sportDisplay = document.querySelector('[data-role="sport-display"]');
             const eventDisplay = document.querySelector('[data-role="event-display"]');
+            const genderDisplay = document.querySelector('[data-role="gender-display"]');
             const MAX_RESULTS = 12;
             const selected = [];
 
@@ -247,14 +264,19 @@
 
             populateSelect(sportSelect, SPORTS);
             populateSelect(eventSelect, EVENTS);
+            populateSelect(genderSelect, GENDERS, { valueKey: 'value' });
             updateDropdownDisplay(sportSelect, sportDisplay);
             updateDropdownDisplay(eventSelect, eventDisplay);
+            updateDropdownDisplay(genderSelect, genderDisplay);
 
             sportSelect?.addEventListener('change', () =>
                 updateDropdownDisplay(sportSelect, sportDisplay)
             );
             eventSelect?.addEventListener('change', () =>
                 updateDropdownDisplay(eventSelect, eventDisplay)
+            );
+            genderSelect?.addEventListener('change', () =>
+                updateDropdownDisplay(genderSelect, genderDisplay)
             );
 
             searchInput.addEventListener('input', () => {
