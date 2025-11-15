@@ -335,6 +335,10 @@ tbody tr:hover td {
     text-align: center;
 }
 
+.align-left {
+    text-align: left;
+}
+
 @media (max-width: 1080px) {
     .dashboard {
         grid-template-columns: 1fr 1fr;
