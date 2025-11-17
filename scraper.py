@@ -153,7 +153,7 @@ class athlete_spider(spiders.Spider):
             if event_name not in EVENT_VALUES:
                 print(event_name + " not included in Event Enum")
                 continue
-
+            
             yield {
                 'athlete_name': athlete_name,
                 'school_name': self.school_name,
@@ -175,7 +175,7 @@ def crawl_school(roster_link):
 def main():
     inp = input(str('Do you want to scrape data, read data, or initialize database? (S/R/I): '))
     if inp.upper() == 'S':
-        crawl_school('https://ga.milesplit.com/teams/9127-hebron-christian/roster')
+        crawl_school('https://ga.milesplit.com/teams/4391-dacula/roster')
     elif inp.upper() == 'R':
         read_database()
     elif inp.upper() == 'I':
