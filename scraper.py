@@ -59,7 +59,7 @@ def initialize_athlete_database():
             FOREIGN KEY (event_id) REFERENCES events (event_id),
             FOREIGN KEY (school_id) REFERENCES schools (school_id),
             FOREIGN KEY (gender_id) REFERENCES genders (gender_id),
-            UNIQUE (athlete_id, event_id)
+            UNIQUE (athlete_id, event_id, school_id, gender_id)
         )
     '''
     )
@@ -97,8 +97,8 @@ def read_database():
             JOIN schools s ON r.school_id = s.school_id
             JOIN genders g ON r.gender_id = g.gender_id
             JOIN events e ON r.event_id = e.event_id
-            ORDER BY a.name, e.event_name
-        """):
+            WHERE e.event_name = ?
+            ORDER BY a.athlete_id, e.event_name""", ('5000 Meter Run',)):
             print(row)
     except sqlite3.Error as e:
         print(f"Error reading database: {e}")
@@ -120,7 +120,7 @@ class athlete_spider(spiders.Spider):
         initialize_athlete_database()
 
     def parse(self, response): # Parse the school roster page
-        self.school_name = response.xpath("//section[@class='jumbotron-content']/h1/text()").get()
+        self.school_name = response.xpath("//section[@class='jumbotron-content']/h1/text()").get().strip()
         data_season_xpath = "//li[@class='athlete-row data-row']/div[@data-season-id='{}']".format(self.sport.value) # Set the xpath for the sport
         athlete_active_seasons = response.xpath(HTML_PATHS['roster_parent_xpath']).xpath(data_season_xpath) # Gets the athletes of the chosen sport
         for season in athlete_active_seasons: # Iterates over all athletes of the given sport
@@ -172,10 +172,25 @@ def crawl_school(roster_link):
     process.crawl(athlete_spider, school_link=roster_link, sport=Sport.CROSS_COUNTRY)
     process.start()
 
+def crawl_schools(roster_links):
+    process = CrawlerProcess()
+    process = CrawlerProcess(settings={
+        'ITEM_PIPELINES': {
+            'pipelines.AthleteDatabasePipeline': 300
+        }
+    })
+    for link in roster_links:
+        process.crawl(athlete_spider, school_link=link, sport=Sport.CROSS_COUNTRY)
+    process.start()
+
 def main():
     inp = input(str('Do you want to scrape data, read data, or initialize database? (S/R/I): '))
     if inp.upper() == 'S':
-        crawl_school('https://ga.milesplit.com/teams/4391-dacula/roster')
+        crawl_schools(['https://ga.milesplit.com/teams/4452-parkview-high-school/roster',
+                    'https://ga.milesplit.com/teams/22701-archer/roster',
+                    'https://ga.milesplit.com/teams/4157-mill-creek-high-school/roster',
+                    'https://ga.milesplit.com/teams/4328-brookwood/roster',
+                    'https://ga.milesplit.com/teams/4466-buford-high-school/roster'])
     elif inp.upper() == 'R':
         read_database()
     elif inp.upper() == 'I':
