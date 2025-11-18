@@ -48,7 +48,6 @@
                         <h2>Virtual meet</h2>
                         <p>Choose sport, event, and gender to view standings.</p>
                     </div>
-                    <button type="button" class="simulate-button" data-role="simulate-button" aria-label="Run simulation">Go</button>
                 </div>
                 <div class="panel__body panel__body--padded">
                     <div class="panel__filters">
@@ -94,18 +93,15 @@
                                     <th scope="col" class="align-center">Points</th>
                                 </tr>
                             </thead>
-                            <tbody data-role="results-body"></tbody>
+                            <tbody>
+                                <tr>
+                                    <td class="align-center">1</td>
+                                    <td>Jameson Pifer</td>
+                                    <td>Collins Hill High School</td>
+                                    <td>14:37</td>
+                                    <td class="align-center">1</td>
+                            </tbody>
                         </table>
-                    </div>
-                    <p class="results-message" data-role="results-message">
-                        Select schools, configure filters, then press Go to simulate your meet.
-                    </p>
-                    <div class="team-results" data-role="team-results" hidden>
-                        <div class="team-results__header">
-                            <h3>Team scores</h3>
-                            <p data-role="team-results-hint">Cross Country scoring summary.</p>
-                        </div>
-                        <ul class="team-results__list" data-role="team-results-list"></ul>
                     </div>
                 </div>
             </section>
@@ -127,9 +123,9 @@
                 { id: 'FIFTEEN_HUNDRED', label: '1500 Meter Run' },
                 { id: 'TWELVE_HUNDRED', label: '1200 Meter Run' },
                 { id: 'EIGHT_HUNDRED', label: '800 Meter Run' },
-                { id: 'FOUR_HUNDRED', label: '400 Meter Dash' },
-                { id: 'TWO_HUNDRED', label: '200 Meter Dash' },
-                { id: 'ONE_HUNDRED', label: '100 Meter Dash' }
+                { id: 'FOUR_HUNDRED', label: '400 Meter Run' },
+                { id: 'TWO_HUNDRED', label: '200 Meter Run' },
+                { id: 'ONE_HUNDRED', label: '100 Meter Run' }
             ];
 
             const GENDERS = [
@@ -150,12 +146,6 @@
             const sportDisplay = document.querySelector('[data-role="sport-display"]');
             const eventDisplay = document.querySelector('[data-role="event-display"]');
             const genderDisplay = document.querySelector('[data-role="gender-display"]');
-            const resultsBody = document.querySelector('[data-role="results-body"]');
-            const resultsMessage = document.querySelector('[data-role="results-message"]');
-            const simulateButton = document.querySelector('[data-role="simulate-button"]');
-            const teamResults = document.querySelector('[data-role="team-results"]');
-            const teamResultsList = document.querySelector('[data-role="team-results-list"]');
-            const teamResultsHint = document.querySelector('[data-role="team-results-hint"]');
             const MAX_RESULTS = 12;
             const selected = [];
 
@@ -283,174 +273,8 @@
                     if (item.label) {
                         option.dataset.label = item.label;
                     }
-                    if (Object.prototype.hasOwnProperty.call(item, 'value')) {
-                        option.dataset.value = item.value;
-                    }
                     selectEl.appendChild(option);
                 });
-            };
-
-            const safeText = (value) => (value === undefined || value === null ? '' : value);
-
-            const setResultsMessage = (message, options = {}) => {
-                if (!resultsMessage) {
-                    return;
-                }
-                const { type } = options;
-                const copy = message || '';
-                resultsMessage.textContent = copy;
-                resultsMessage.hidden = !copy;
-                resultsMessage.classList.toggle('results-message--error', type === 'error');
-            };
-
-            const renderAthleteRows = (rows = []) => {
-                if (!resultsBody) {
-                    return;
-                }
-                resultsBody.innerHTML = '';
-                if (!rows.length) {
-                    return;
-                }
-                const fragment = document.createDocumentFragment();
-                rows.forEach((row) => {
-                    const tr = document.createElement('tr');
-                    const cells = [
-                        { text: row?.place, className: 'align-center' },
-                        { text: row?.athlete, className: 'align-left' },
-                        { text: row?.school, className: 'align-left' },
-                        { text: row?.time, className: 'align-left' },
-                        { text: row?.points, className: 'align-center' }
-                    ];
-                    cells.forEach((cell) => {
-                        const td = document.createElement('td');
-                        if (cell.className) {
-                            td.className = cell.className;
-                        }
-                        td.textContent = safeText(cell.text);
-                        tr.appendChild(td);
-                    });
-                    fragment.appendChild(tr);
-                });
-                resultsBody.appendChild(fragment);
-            };
-
-            const renderTeamScores = (teams = [], sport) => {
-                if (!teamResults || !teamResultsList || !teamResultsHint) {
-                    return;
-                }
-                if (sport !== 'CROSS_COUNTRY' || !teams.length) {
-                    teamResults.hidden = true;
-                    teamResultsList.innerHTML = '';
-                    teamResultsHint.textContent = 'Team scoring is available for Cross Country meets.';
-                    return;
-                }
-                teamResults.hidden = false;
-                teamResultsHint.textContent = 'Top 5 runners score; 6th and 7th runners break ties.';
-                teamResultsList.innerHTML = '';
-                const fragment = document.createDocumentFragment();
-                teams.forEach((team, index) => {
-                    const li = document.createElement('li');
-                    li.className = 'team-results__item';
-                    const placeLabel =
-                        team?.eligible && team?.score !== null && team?.score !== undefined
-                            ? `${index + 1}.`
-                            : '—';
-                    const heading = document.createElement('p');
-                    heading.className = 'team-results__team';
-                    heading.textContent = `${placeLabel} ${team?.school || 'N/A'}`;
-                    const score = document.createElement('p');
-                    score.className = 'team-results__score';
-                    score.textContent =
-                        team?.eligible && team?.score !== null && team?.score !== undefined
-                            ? `Score: ${team.score}`
-                            : team?.status || 'Forfeit';
-                    const detail = document.createElement('p');
-                    detail.className = 'team-results__detail';
-                    const placeList =
-                        Array.isArray(team?.places) && team.places.length
-                            ? `Places: ${team.places.join(', ')}`
-                            : `Finishers: ${team?.finisher_count || 0}`;
-                    const sixth = team?.sixth_runner ? ` • 6th: ${team.sixth_runner}` : '';
-                    detail.textContent = `${placeList}${sixth}`;
-                    li.append(heading, score, detail);
-                    if (team?.tiebreak_note) {
-                        const note = document.createElement('p');
-                        note.className = 'team-results__note';
-                        note.textContent = team.tiebreak_note;
-                        li.appendChild(note);
-                    }
-                    fragment.appendChild(li);
-                });
-                teamResultsList.appendChild(fragment);
-            };
-
-            const toggleSimulateButton = (isLoading) => {
-                if (!simulateButton) {
-                    return;
-                }
-                simulateButton.disabled = isLoading;
-                simulateButton.textContent = isLoading ? 'Working...' : 'Go';
-            };
-
-            const runSimulation = async () => {
-                if (!simulateButton) {
-                    return;
-                }
-                if (!selected.length) {
-                    renderAthleteRows([]);
-                    renderTeamScores([], sportSelect?.value);
-                    setResultsMessage('Select at least one school to run the simulation.', {
-                        type: 'error'
-                    });
-                    return;
-                }
-                const payload = {
-                    schools: [...selected],
-                    sport: sportSelect?.value,
-                    event: eventSelect?.value,
-                    gender: genderSelect?.value
-                };
-                toggleSimulateButton(true);
-                setResultsMessage('Calculating results...');
-                try {
-                    const response = await fetch('/api/simulate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const data = await response.json();
-                    if (!response.ok) {
-                        throw new Error(data?.error || 'Unable to simulate results.');
-                    }
-                    renderAthleteRows(data?.athletes || []);
-                    renderTeamScores(data?.team_scores || [], data?.sport);
-                    const summary = [];
-                    if (data?.finishers) {
-                        summary.push(`Calculated from ${data.finishers} eligible finishers.`);
-                    }
-                    if (Array.isArray(data?.athletes) && data.athletes.length) {
-                        summary.push(`Showing ${data.athletes.length} athletes.`);
-                    }
-                    if (data?.message) {
-                        summary.push(data.message);
-                    }
-                    if (Array.isArray(data?.missing_schools) && data.missing_schools.length) {
-                        summary.push(`No eligible entries for: ${data.missing_schools.join(', ')}.`);
-                    }
-                    if (!summary.length) {
-                        summary.push('Results updated.');
-                    }
-                    setResultsMessage(summary.join(' '));
-                } catch (error) {
-                    console.error('Simulation error', error);
-                    renderAthleteRows([]);
-                    renderTeamScores([], sportSelect?.value);
-                    setResultsMessage(error?.message || 'Unable to simulate results.', {
-                        type: 'error'
-                    });
-                } finally {
-                    toggleSimulateButton(false);
-                }
             };
 
             const updateDropdownDisplay = (selectEl, displayEl) => {
@@ -463,28 +287,20 @@
 
             populateSelect(sportSelect, SPORTS);
             populateSelect(eventSelect, EVENTS);
-            populateSelect(genderSelect, GENDERS);
+            populateSelect(genderSelect, GENDERS, { valueKey: 'value' });
             updateDropdownDisplay(sportSelect, sportDisplay);
             updateDropdownDisplay(eventSelect, eventDisplay);
             updateDropdownDisplay(genderSelect, genderDisplay);
-            setResultsMessage(
-                resultsMessage?.textContent?.trim() ||
-                    'Select schools, configure filters, then press Go to simulate your meet.'
-            );
 
-            sportSelect?.addEventListener('change', () => {
-                updateDropdownDisplay(sportSelect, sportDisplay);
-                if (sportSelect?.value !== 'CROSS_COUNTRY') {
-                    renderTeamScores([], sportSelect?.value);
-                }
-            });
+            sportSelect?.addEventListener('change', () =>
+                updateDropdownDisplay(sportSelect, sportDisplay)
+            );
             eventSelect?.addEventListener('change', () =>
                 updateDropdownDisplay(eventSelect, eventDisplay)
             );
             genderSelect?.addEventListener('change', () =>
                 updateDropdownDisplay(genderSelect, genderDisplay)
             );
-            simulateButton?.addEventListener('click', runSimulation);
 
             searchInput.addEventListener('input', () => {
                 const value = searchInput.value;
