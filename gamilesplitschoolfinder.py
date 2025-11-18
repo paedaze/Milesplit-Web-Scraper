@@ -17,7 +17,7 @@ class gamilesplit_school_scraper(spiders.Spider):
         table = response.xpath("//table[@class='teams order-table table']/tbody/tr/td/a")
         for school in table:
             school_name = school.xpath("text()").get(default="").strip()
-            if "null" in school_name:
+            if "null" in school_name or 'Brookwood High School' == school_name:
                 continue
             else:
                 self.school_links[school_name] = school.attrib["href"] + '/roster'
