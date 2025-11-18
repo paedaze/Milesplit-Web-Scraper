@@ -11,7 +11,7 @@ class AthleteDatabasePipeline:
             self.cursor = self.conn.cursor()
 
             # Find school_id from school_name
-            self.cursor.execute("SELECT school_id FROM schools WHERE school_name = ?", (item['school_name'].strip(),))
+            self.cursor.execute("SELECT school_id FROM schools WHERE school_name = ?", (item['school_name'],))
             school_row = self.cursor.fetchone()
             if not school_row:
                 return
