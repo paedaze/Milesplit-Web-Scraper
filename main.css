@@ -298,38 +298,11 @@ body {
     cursor: pointer;
 }
 
-.simulate-button {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 999px;
-    padding: 0.85rem 2.25rem;
-    font-size: 1.05rem;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 10px 20px rgba(15, 110, 250, 0.3);
-    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.simulate-button:hover:not(:disabled) {
-    background: #0c5ed8;
-    transform: translateY(-1px);
-    box-shadow: 0 14px 24px rgba(15, 110, 250, 0.35);
-}
-
-.simulate-button:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: 0 6px 12px rgba(15, 110, 250, 0.2);
-}
-
 .table-wrapper {
     background: #fff;
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: auto;
-    max-height: 24rem;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
     min-height: 0;
     flex: 1;
@@ -356,84 +329,6 @@ th {
 
 tbody tr:hover td {
     background: var(--panel-2);
-}
-
-.results-message {
-    margin: 0;
-    font-size: 0.92rem;
-    font-weight: 500;
-    color: var(--muted);
-}
-
-.results-message--error {
-    color: #b42318;
-}
-
-.team-results {
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1rem 1.1rem;
-    background: var(--panel-2);
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-}
-
-.team-results__header {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-}
-
-.team-results__header h3 {
-    margin: 0;
-    font-size: 1.05rem;
-}
-
-.team-results__header p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.9rem;
-}
-
-.team-results__list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-}
-
-.team-results__item {
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: #fff;
-    padding: 0.8rem 1rem;
-}
-
-.team-results__team {
-    margin: 0;
-    font-weight: 700;
-}
-
-.team-results__score {
-    margin: 0.2rem 0 0;
-    font-weight: 600;
-    color: var(--accent);
-}
-
-.team-results__detail {
-    margin: 0.3rem 0 0;
-    color: var(--muted);
-    font-size: 0.88rem;
-}
-
-.team-results__note {
-    margin: 0.35rem 0 0;
-    font-size: 0.85rem;
-    color: #bb4f00;
-    font-weight: 600;
 }
 
 .align-center {
