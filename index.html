@@ -48,6 +48,7 @@
                         <h2>Virtual meet</h2>
                         <p>Choose sport, event, and gender to view standings.</p>
                     </div>
+                    <button type="button" class="panel__go-button" data-role="go-button">Go</button>
                 </div>
                 <div class="panel__body panel__body--padded">
                     <div class="panel__filters">
@@ -146,8 +147,37 @@
             const sportDisplay = document.querySelector('[data-role="sport-display"]');
             const eventDisplay = document.querySelector('[data-role="event-display"]');
             const genderDisplay = document.querySelector('[data-role="gender-display"]');
+            const goButton = document.querySelector('[data-role="go-button"]');
             const MAX_RESULTS = 12;
             const selected = [];
+
+            const requestSimulationData = async () => {
+                const apiURL = 'http://127.0.0.1:5000/api/process-virtual-meet'; // IMPORTANT: Change this URL when deploying
+                const meetInfo = {
+                    schools: selected,
+                    sport: sportSelect.value,
+                    event: eventSelect.value
+                };
+
+                try {
+                    const response = await fetch(apiURL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(meetInfo)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Request failed with status ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error('Simulation request failed', error);
+                    const message =
+                        error instanceof Error ? error.message : 'Unable to process virtual meet.';
+                    window.alert(`Unable to fetch simulation data. ${message}`);
+                }
+            };
 
             const setHint = (el, message, isHidden) => {
                 if (!el) {
@@ -301,6 +331,7 @@
             genderSelect?.addEventListener('change', () =>
                 updateDropdownDisplay(genderSelect, genderDisplay)
             );
+            goButton?.addEventListener('click', requestSimulationData);
 
             searchInput.addEventListener('input', () => {
                 const value = searchInput.value;
