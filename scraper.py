@@ -6,21 +6,26 @@ from enum import Enum
 import sqlite3
 
 class Sport(Enum):
-    CROSS_COUNTRY = 3
-    OUTDOOR_TRACK = 2
-    INDOOR_TRACK = 1
+    CROSS_COUNTRY = 'Cross Country'
+    TRACK = 'Track'
 
 class Event(Enum):
     FIVE_THOUSAND = '5000 Meter Run'
     TWO_MILE = '2 Mile Run'
     THIRTYTWO_HUNDRED = '3200 Meter Run'
+    THREE_THOUSAND = '3000 Meter Run'
     SIXTEEN_HUNDRED = '1600 Meter Run'
     FIFTEEN_HUNDRED = '1500 Meter Run'
     TWELVE_HUNDRED = '1200 Meter Run'
     EIGHT_HUNDRED = '800 Meter Run'
     FOUR_HUNDRED = '400 Meter Dash'
+    THREE_HUNDRED_HURDLES = '300 Meter Hurdles'
     TWO_HUNDRED = '200 Meter Dash'
+    ONE_HUNDRED_TEN_HURDLES = '110 Meter Hurdles'
     ONE_HUNDRED = '100 Meter Dash'
+    ONE_HUNDRED_HURDLES = '100 Meter Hurdles'
+    SIXTY = '60 Meter Dash'
+    SIXTY_HURDLES = '60 Meter Hurdles'
 
 class Gender(Enum):
     MALE = 'm'
@@ -111,20 +116,19 @@ def read_database():
 class athlete_spider(spiders.Spider):
     name = 'athletes'
 
-    def __init__(self, school_link, sport, *args, **kwargs): # Allow spider to access school link, sport, event, and the output
+    def __init__(self, school_link, *args, **kwargs): # Allow spider to access school link, sport, event, and the output
         super().__init__(*args, **kwargs)
         self.school_link = school_link
-        self.sport = sport
         self.start_urls = [self.school_link]
         self.school_name = ''
         initialize_athlete_database()
 
     def parse(self, response): # Parse the school roster page
         self.school_name = response.xpath("//section[@class='jumbotron-content']/h1/text()").get().strip()
-        data_season_xpath = "//li[@class='athlete-row data-row']/div[@data-season-id='{}']".format(self.sport.value) # Set the xpath for the sport
-        athlete_active_seasons = response.xpath(HTML_PATHS['roster_parent_xpath']).xpath(data_season_xpath) # Gets the athletes of the chosen sport
-        for season in athlete_active_seasons: # Iterates over all athletes of the given sport
-            athlete_row = season.xpath('..')
+        active_athlete_xpath = ("//li[contains(@class, 'athlete-row') and contains(@class, 'data-row')]"
+                        "[not(contains(normalize-space(@style), 'display: none'))]")
+        active_athletes = response.xpath(HTML_PATHS['roster_parent_xpath']).xpath(active_athlete_xpath) # Get athletes
+        for athlete_row in active_athletes: # Iterates over all athletes of the given sport
             athlete_link = athlete_row.xpath(HTML_PATHS['student_info_xpath']).attrib["href"]
             gender = Gender(athlete_row.xpath(HTML_PATHS['student_gender_xpath'] + '/text()').get())
             
@@ -169,7 +173,7 @@ def crawl_school(roster_link):
             'pipelines.AthleteDatabasePipeline': 300
         }
     })
-    process.crawl(athlete_spider, school_link=roster_link, sport=Sport.CROSS_COUNTRY)
+    process.crawl(athlete_spider, school_link=roster_link)
     process.start()
 
 def crawl_schools(roster_links):
@@ -180,17 +184,14 @@ def crawl_schools(roster_links):
         }
     })
     for link in roster_links:
-        process.crawl(athlete_spider, school_link=link, sport=Sport.CROSS_COUNTRY)
+        process.crawl(athlete_spider, school_link=link)
     process.start()
 
 def main():
     inp = input(str('Do you want to scrape data, read data, or initialize database? (S/R/I): '))
     if inp.upper() == 'S':
         crawl_schools(['https://ga.milesplit.com/teams/4452-parkview-high-school/roster',
-                    'https://ga.milesplit.com/teams/22701-archer/roster',
-                    'https://ga.milesplit.com/teams/4157-mill-creek-high-school/roster',
-                    'https://ga.milesplit.com/teams/4328-brookwood/roster',
-                    'https://ga.milesplit.com/teams/4466-buford-high-school/roster'])
+                    'https://ga.milesplit.com/teams/22701-archer/roster'])
     elif inp.upper() == 'R':
         read_database()
     elif inp.upper() == 'I':
