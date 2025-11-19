@@ -1,6 +1,4 @@
 import sqlite3
-from scrapy import Request
-from scrapy import crawler
 from scrapy import spiders
 from scrapy.crawler import CrawlerProcess
 
