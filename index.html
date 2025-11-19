@@ -112,21 +112,26 @@
         (function () {
             const SPORTS = [
                 { id: 'CROSS_COUNTRY', label: 'Cross Country', seasonId: 3 },
-                { id: 'OUTDOOR_TRACK', label: 'Outdoor Track', seasonId: 2 },
-                { id: 'INDOOR_TRACK', label: 'Indoor Track', seasonId: 1 }
+                { id: 'TRACK', label: 'Track'},
             ];
 
             const EVENTS = [
                 { id: 'FIVE_THOUSAND', label: '5000 Meter Run' },
                 { id: 'TWO_MILE', label: '2 Mile Run' },
                 { id: 'THIRTYTWO_HUNDRED', label: '3200 Meter Run' },
+                { id: 'THREE_THOUSAND', label: '3000 Meter Run' },
                 { id: 'SIXTEEN_HUNDRED', label: '1600 Meter Run' },
                 { id: 'FIFTEEN_HUNDRED', label: '1500 Meter Run' },
                 { id: 'TWELVE_HUNDRED', label: '1200 Meter Run' },
                 { id: 'EIGHT_HUNDRED', label: '800 Meter Run' },
-                { id: 'FOUR_HUNDRED', label: '400 Meter Run' },
-                { id: 'TWO_HUNDRED', label: '200 Meter Run' },
-                { id: 'ONE_HUNDRED', label: '100 Meter Run' }
+                { id: 'FOUR_HUNDRED', label: '400 Meter Dash' },
+                { id: 'THREE_HUNDRED_HURDLES', label: '300 Meter Hurdles' },
+                { id: 'TWO_HUNDRED', label: '200 Meter Dash' },
+                { id: 'ONE_HUNDRED_TEN_HURDLES', label: '110 Meter Hurdles' },
+                { id: 'ONE_HUNDRED', label: '100 Meter Dash' },
+                { id: 'ONE_HUNDRED_HURDLES', label: '100 Meter Hurdles' },
+                { id: 'SIXTY', label: '60 Meter Dash' },
+                { id: 'SIXTY_HURDLES', label: '60 Meter Hurdles' }
             ];
 
             const GENDERS = [
@@ -156,7 +161,8 @@
                 const meetInfo = {
                     schools: selected,
                     sport: sportSelect.value,
-                    event: eventSelect.value
+                    event: eventSelect.value,
+                    gender: genderSelect.value
                 };
 
                 try {
