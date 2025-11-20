@@ -89,7 +89,7 @@ def initialize_athlete_database():
     conn.close()
 
 # FOR DEVELOPER TESTING: Prints out the athletes.db database to the terminal
-def read_database():
+def read_database(event_name):
     try:
         conn = sqlite3.connect('athletes.db')
         cursor = conn.cursor()
@@ -103,7 +103,7 @@ def read_database():
             JOIN genders g ON r.gender_id = g.gender_id
             JOIN events e ON r.event_id = e.event_id
             WHERE e.event_name = ?
-            ORDER BY a.athlete_id, e.event_name""", ('5000 Meter Run',)):
+            ORDER BY a.athlete_id""", (event_name,)):
             print(row)
     except sqlite3.Error as e:
         print(f"Error reading database: {e}")
@@ -190,10 +190,10 @@ def crawl_schools(roster_links):
 def main():
     inp = input(str('Do you want to scrape data, read data, or initialize database? (S/R/I): '))
     if inp.upper() == 'S':
-        crawl_schools(['https://ga.milesplit.com/teams/4452-parkview-high-school/roster',
-                    'https://ga.milesplit.com/teams/22701-archer/roster'])
+        crawl_schools(['https://ga.milesplit.com/teams/4436-grayson-high-school/roster'])
     elif inp.upper() == 'R':
-        read_database()
+        event_name = input(str('Chews Event: '))
+        read_database(event_name)
     elif inp.upper() == 'I':
         initialize_athlete_database()
 
